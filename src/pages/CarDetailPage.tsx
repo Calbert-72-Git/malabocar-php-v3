@@ -8,7 +8,7 @@ import { Button } from '../components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Importando los nuevos componentes refactorizados
+// Importando los componentes refactorizados
 import { WhatsAppButton } from '../components/car-detail/WhatsAppButton';
 import { CarImageGallery } from '../components/car-detail/CarImageGallery';
 import { CarSpecifications } from '../components/car-detail/CarSpecifications';

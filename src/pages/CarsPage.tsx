@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -28,8 +29,7 @@ const CarsPage = () => {
     setMaxPrice(priceRange[1]);
   }, [priceRange]);
 
-  // Corregir el error TS2554: Expected 0-4 arguments, but got 6.
-  // Modificamos esta línea para asegurarnos de que getFilteredCars recibe los argumentos correctos
+  // Filtrar los coches según los criterios
   const filteredCars = getFilteredCars(search, minPrice, maxPrice, selectedBrand);
   
   return (
