@@ -1,0 +1,60 @@
+
+/* Car details */
+.car-detail-gallery {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.car-detail-info h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.car-detail-price-stock {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.car-detail-description {
+  margin-bottom: 2rem;
+}
+
+.car-specs {
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.spec-item label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  display: block;
+}
+
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+}
+
+.feature-item i {
+  color: #10b981;
+  margin-right: 0.5rem;
+}
