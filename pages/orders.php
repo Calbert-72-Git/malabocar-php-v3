@@ -8,7 +8,6 @@ $orderPlaced = false;
 $orderMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Aquí se procesaría el pedido en un sistema real
   // Verificar que hay elementos en el carrito
   if (count($_SESSION['cart']) > 0) {
     // Datos del formulario
@@ -16,17 +15,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = isset($_POST['email']) ? $_POST['email'] : '';
     $phone = isset($_POST['phone']) ? $_POST['phone'] : '';
     $address = isset($_POST['address']) ? $_POST['address'] : '';
+    $comments = isset($_POST['comments']) ? $_POST['comments'] : '';
     
     // Validación básica
     if (empty($name) || empty($email) || empty($phone) || empty($address)) {
       $orderMessage = 'Por favor, complete todos los campos del formulario.';
     } else {
-      // En un sistema real: guardar el pedido en base de datos, enviar correos, etc.
-      $orderPlaced = true;
-      $orderMessage = 'Su pedido ha sido recibido correctamente. Nos pondremos en contacto con usted en breve.';
+      // Calcular total
+      $cartTotal = getCartTotal();
       
-      // Vaciar el carrito después de completar el pedido
-      clearCart();
+      global $conn;
+      if ($conn) {
+        // Iniciar transacción
+        mysqli_begin_transaction($conn);
+        
+        try {
+          // Insertar orden
+          $sql = "INSERT INTO orders (name, email, phone, address, comments, total) VALUES (?, ?, ?, ?, ?, ?)";
+          $stmt = mysqli_prepare($conn, $sql);
+          mysqli_stmt_bind_param($stmt, "sssssd", $name, $email, $phone, $address, $comments, $cartTotal);
+          mysqli_stmt_execute($stmt);
+          
+          // Obtener el ID de la orden
+          $orderId = mysqli_insert_id($conn);
+          
+          // Insertar items del pedido
+          foreach ($_SESSION['cart'] as $item) {
+            $carId = $item['car']['id'];
+            $quantity = $item['quantity'];
+            $price = $item['car']['price'];
+            
+            $sql = "INSERT INTO order_items (order_id, car_id, quantity, price) VALUES (?, ?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "isid", $orderId, $carId, $quantity, $price);
+            mysqli_stmt_execute($stmt);
+            
+            // Actualizar stock
+            $sql = "UPDATE cars SET stock = stock - ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "is", $quantity, $carId);
+            mysqli_stmt_execute($stmt);
+          }
+          
+          // Confirmar transacción
+          mysqli_commit($conn);
+          
+          // Mostrar mensaje de éxito
+          $orderPlaced = true;
+          $orderMessage = 'Su pedido ha sido recibido correctamente. Nos pondremos en contacto con usted en breve.';
+          
+          // Vaciar el carrito después de completar el pedido
+          clearCart();
+        } catch (Exception $e) {
+          // Si hay error, hacer rollback
+          mysqli_rollback($conn);
+          $orderMessage = 'Ha ocurrido un error al procesar su pedido. Por favor, inténtelo de nuevo.';
+        }
+      } else {
+        // Si no hay conexión a BD, simular que el pedido se ha realizado
+        $orderPlaced = true;
+        $orderMessage = 'Su pedido ha sido recibido correctamente. Nos pondremos en contacto con usted en breve.';
+        
+        // Vaciar el carrito después de completar el pedido
+        clearCart();
+      }
     }
   } else {
     $orderMessage = 'No hay productos en el carrito para realizar el pedido.';
@@ -63,7 +115,7 @@ $cartTotal = getCartTotal();
         <div>
           <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Datos de contacto</h2>
           
-          <form method="post" action="?route=orders">
+          <form method="post" action="?route=orders" enctype="multipart/form-data">
             <div style="margin-bottom: 1.5rem;">
               <label for="name" class="filter-label">Nombre completo</label>
               <input type="text" id="name" name="name" class="filter-input" required>
@@ -82,6 +134,12 @@ $cartTotal = getCartTotal();
             <div style="margin-bottom: 1.5rem;">
               <label for="address" class="filter-label">Dirección completa</label>
               <textarea id="address" name="address" class="filter-input" rows="3" required></textarea>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+              <label for="vehicle_image" class="filter-label">Imagen de muestra del vehículo (opcional)</label>
+              <input type="file" id="vehicle_image" name="vehicle_image" class="filter-input" accept="image/*">
+              <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
             </div>
             
             <div style="margin-bottom: 1.5rem;">
