@@ -5,8 +5,11 @@ import Layout from '../components/Layout';
 import { getCarById } from '../data/cars';
 import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
-import { ShoppingCart, ChevronLeft } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Card, CardContent } from '../components/ui/card';
+import { AspectRatio } from '../components/ui/aspect-ratio';
+import { cn } from '../lib/utils';
 
 const CarDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +43,7 @@ const CarDetailPage = () => {
   
   const handleAddToCart = () => {
     addToCart(car);
+    toast.success('Se ha añadido el vehículo al carrito');
   };
   
   const handleOrder = () => {
@@ -47,10 +51,19 @@ const CarDetailPage = () => {
     toast.success('Se ha añadido el vehículo al carrito');
     navigate('/orders');
   };
+
+  const handleWhatsApp = () => {
+    const message = encodeURIComponent(
+      `Hola, estoy interesado en el vehículo ${car.brand} ${car.model} (${car.year}) con precio ${formatPrice(car.price)}. ¿Podría darme más información?`
+    );
+    const whatsappUrl = `https://wa.me/+34600000000?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    toast.success('Abriendo WhatsApp...');
+  };
   
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         <Button 
           onClick={() => navigate(-1)}
           variant="ghost"
@@ -62,90 +75,103 @@ const CarDetailPage = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Images Section */}
-          <div className="space-y-4">
-            <div className="bg-gray-100 rounded-lg overflow-hidden aspect-[4/3]">
-              <img
-                src={car.images[activeImageIndex]}
-                alt={`${car.brand} ${car.model}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div className="grid grid-cols-3 gap-2">
-              {car.images.map((image, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer rounded-md overflow-hidden ${
-                    index === activeImageIndex ? 'ring-2 ring-automotive-600' : ''
-                  }`}
-                  onClick={() => setActiveImageIndex(index)}
-                >
+          <Card className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <CardContent className="p-0">
+              <div className="mb-4">
+                <AspectRatio ratio={4/3}>
                   <img
-                    src={image}
-                    alt={`${car.brand} ${car.model} - Vista ${index + 1}`}
-                    className="w-full h-24 object-cover"
+                    src={car.images[activeImageIndex]}
+                    alt={`${car.brand} ${car.model}`}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
-                </div>
-              ))}
-            </div>
-          </div>
+                </AspectRatio>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-2 p-4">
+                {car.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "cursor-pointer rounded-md overflow-hidden transition-all duration-200 hover:opacity-90",
+                      index === activeImageIndex 
+                        ? "ring-2 ring-automotive-600 scale-[0.98]" 
+                        : "opacity-80 hover:scale-95"
+                    )}
+                    onClick={() => setActiveImageIndex(index)}
+                  >
+                    <AspectRatio ratio={4/3}>
+                      <img
+                        src={image}
+                        alt={`${car.brand} ${car.model} - Vista ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </AspectRatio>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
           
           {/* Details Section */}
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {car.brand} {car.model} {car.year}
-            </h1>
-            
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-2xl font-bold text-automotive-700">
-                {formatPrice(car.price)}
-              </span>
-              <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                car.stock > 0 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {car.stock > 0 ? `${car.stock} disponibles` : 'No disponible'}
-              </span>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold mb-2 text-automotive-800">
+                {car.brand} {car.model} {car.year}
+              </h1>
+              
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-2xl font-bold text-automotive-700">
+                  {formatPrice(car.price)}
+                </span>
+                <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                  car.stock > 0 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {car.stock > 0 ? `${car.stock} disponibles` : 'No disponible'}
+                </span>
+              </div>
             </div>
             
-            <div className="prose prose-sm mb-6">
+            <div className="prose prose-sm">
               <p>{car.description}</p>
             </div>
             
             {/* Specs */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h2 className="text-lg font-semibold mb-4">Especificaciones</h2>
-              <div className="grid grid-cols-2 gap-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Motor</p>
-                  <p className="font-medium">{car.specs.engine}</p>
+            <Card className="bg-gray-50">
+              <CardContent className="p-4 space-y-4">
+                <h2 className="text-lg font-semibold">Especificaciones</h2>
+                <div className="grid grid-cols-2 gap-y-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Motor</p>
+                    <p className="font-medium">{car.specs.engine}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Transmisión</p>
+                    <p className="font-medium">{car.specs.transmission}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Combustible</p>
+                    <p className="font-medium">{car.specs.fuelType}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Kilometraje</p>
+                    <p className="font-medium">{car.specs.mileage.toLocaleString()} km</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Color exterior</p>
+                    <p className="font-medium">{car.specs.exteriorColor}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Color interior</p>
+                    <p className="font-medium">{car.specs.interiorColor}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Transmisión</p>
-                  <p className="font-medium">{car.specs.transmission}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Combustible</p>
-                  <p className="font-medium">{car.specs.fuelType}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Kilometraje</p>
-                  <p className="font-medium">{car.specs.mileage.toLocaleString()} km</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Color exterior</p>
-                  <p className="font-medium">{car.specs.exteriorColor}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Color interior</p>
-                  <p className="font-medium">{car.specs.interiorColor}</p>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
             
             {/* Features */}
-            <div className="mb-6">
+            <div>
               <h2 className="text-lg font-semibold mb-4">Características</h2>
               <ul className="grid grid-cols-2 gap-y-2 gap-x-4">
                 {car.features.map((feature, index) => (
@@ -160,24 +186,34 @@ const CarDetailPage = () => {
             </div>
             
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 onClick={handleAddToCart}
                 disabled={car.stock === 0}
-                className="flex-1 bg-automotive-600 hover:bg-automotive-700"
+                className="flex-1 bg-automotive-600 hover:bg-automotive-700 shadow-sm transition-all hover:shadow-md"
+                aria-label="Añadir al carrito"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Añadir al carrito
               </Button>
               <Button
-                onClick={handleOrder}
-                disabled={car.stock === 0}
-                variant="outline"
-                className="flex-1"
+                onClick={handleWhatsApp}
+                className="flex-1 bg-green-600 hover:bg-green-700 shadow-sm transition-all hover:shadow-md"
+                aria-label="Contactar por WhatsApp"
               >
-                Hacer un encargo
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Contactar por WhatsApp
               </Button>
             </div>
+            <Button
+              onClick={handleOrder}
+              disabled={car.stock === 0}
+              variant="outline"
+              className="w-full border-automotive-600 text-automotive-700 hover:bg-automotive-50"
+              aria-label="Hacer un encargo"
+            >
+              Hacer un encargo
+            </Button>
           </div>
         </div>
       </div>
