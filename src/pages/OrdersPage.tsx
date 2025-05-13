@@ -8,6 +8,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
+import { Upload } from 'lucide-react';
 
 const OrdersPage = () => {
   const { cartItems, clearCart, getCartTotal } = useCart();
@@ -33,6 +34,8 @@ const OrdersPage = () => {
     city: false,
     postalCode: false,
   });
+
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -47,6 +50,23 @@ const OrdersPage = () => {
         ...formErrors,
         [name]: false
       });
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('La imagen es demasiado grande. Máximo 5MB.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      toast.success('Imagen cargada correctamente');
     }
   };
   
@@ -201,6 +221,52 @@ const OrdersPage = () => {
                     )}
                   </div>
                 </div>
+
+                <div>
+                  <Label htmlFor="vehicleImage" className="mb-1 block">Imagen de muestra del vehículo</Label>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center gap-4">
+                      <Label 
+                        htmlFor="vehicleImage" 
+                        className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                      >
+                        <Upload size={18} />
+                        Subir imagen
+                      </Label>
+                      <Input
+                        id="vehicleImage"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      {imagePreview && (
+                        <span className="text-green-600 text-sm">Imagen cargada</span>
+                      )}
+                    </div>
+                    
+                    {imagePreview && (
+                      <div className="relative mt-2 max-w-md">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="rounded-md max-h-48 object-contain border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                          onClick={() => setImagePreview(null)}
+                        >
+                          <span className="sr-only">Eliminar</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">Opcional. Formatos: JPG, PNG. Máximo 5MB.</p>
+                </div>
                 
                 <div>
                   <Label htmlFor="comments" className="mb-1 block">Comentarios adicionales</Label>
@@ -215,7 +281,7 @@ const OrdersPage = () => {
                 </div>
                 
                 <div className="pt-4">
-                  <Button type="submit" className="w-full bg-automotive-600 hover:bg-automotive-700">
+                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
                     Confirmar pedido
                   </Button>
                 </div>
@@ -257,7 +323,7 @@ const OrdersPage = () => {
                   
                   <div className="border-t border-gray-200 py-4 flex justify-between">
                     <p className="text-lg font-medium text-gray-900">Total</p>
-                    <p className="text-lg font-medium text-automotive-700">
+                    <p className="text-lg font-medium text-red-700">
                       {formatPrice(getCartTotal() * 1.21)}
                     </p>
                   </div>
@@ -267,7 +333,7 @@ const OrdersPage = () => {
                   <p className="text-gray-500">No hay vehículos en su carrito.</p>
                   <Button 
                     asChild
-                    className="mt-4 bg-automotive-600 hover:bg-automotive-700"
+                    className="mt-4 bg-red-600 hover:bg-red-700"
                   >
                     <a href="/cars">Ver catálogo</a>
                   </Button>

@@ -26,11 +26,11 @@ export const GlobalWhatsAppButton = ({ variant = 'floating' }: GlobalWhatsAppBut
       <div className="fixed bottom-6 right-6 z-50">
         <Button 
           onClick={handleWhatsAppClick}
-          size="lg"
-          className="rounded-full bg-green-600 hover:bg-green-700 animate-fade-in shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+          size="icon"
+          className="rounded-full bg-green-600 hover:bg-green-700 animate-fade-in shadow-lg h-12 w-12 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+          aria-label="Consultar por WhatsApp"
         >
-          <MessageCircle className="mr-2 h-5 w-5" /> 
-          Consultar por WhatsApp
+          <MessageCircle className="h-6 w-6" /> 
         </Button>
       </div>
     );
