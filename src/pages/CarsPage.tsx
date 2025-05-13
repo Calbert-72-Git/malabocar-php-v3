@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import CarCard from '../components/CarCard';
@@ -22,7 +21,8 @@ const CarsPage = () => {
   const [selectedFuelType, setSelectedFuelType] = useState<string>('');
   
   const brands = getAvailableBrands();
-  const filteredCars = getFilteredCars(search, minPrice, maxPrice, selectedBrand, selectedYear ? parseInt(selectedYear) : undefined, selectedFuelType);
+  const filteredCars = getFilteredCars(search, minPrice, maxPrice, selectedBrand, 
+    selectedYear ? parseInt(selectedYear) : undefined, selectedFuelType);
   
   // Recopilar años y tipos de combustible disponibles
   useEffect(() => {

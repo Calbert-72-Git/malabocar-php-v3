@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -10,6 +9,41 @@ import { toast } from 'sonner';
 import { Card, CardContent } from '../components/ui/card';
 import { AspectRatio } from '../components/ui/aspect-ratio';
 import { cn } from '../lib/utils';
+
+// Nuevo componente para el botón de WhatsApp flotante
+const WhatsAppFloatingButton = ({ car }: { car: any }) => {
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 0
+    }).format(price);
+  };
+
+  const handleWhatsAppClick = () => {
+    // Crear el mensaje con los detalles del coche y la imagen
+    const carUrl = window.location.href;
+    const message = encodeURIComponent(
+      `Hola, estoy interesado en el vehículo ${car.brand} ${car.model} (${car.year}) con precio ${formatPrice(car.price)}. \n\nDetalles del vehículo: ${carUrl}`
+    );
+    const whatsappUrl = `https://wa.me/+34600000000?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    toast.success('Abriendo WhatsApp...');
+  };
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50">
+      <Button 
+        onClick={handleWhatsAppClick}
+        size="lg"
+        className="rounded-full bg-green-600 hover:bg-green-700 animate-fade-in shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      >
+        <MessageCircle className="mr-2 h-5 w-5" /> 
+        Consultar por WhatsApp
+      </Button>
+    </div>
+  );
+};
 
 const CarDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,14 +94,39 @@ const CarDetailPage = () => {
     window.open(whatsappUrl, '_blank');
     toast.success('Abriendo WhatsApp...');
   };
+
+  // Función mejorada para compartir por WhatsApp con imagen
+  const handleWhatsAppWithImage = () => {
+    // No podemos adjuntar directamente la imagen en WhatsApp mediante URL,
+    // pero podemos crear un mensaje que incluya los detalles y mencionar que hay fotos disponibles
+    const carUrl = window.location.href;
+    const message = encodeURIComponent(
+      `Hola, estoy interesado en el vehículo ${car.brand} ${car.model} (${car.year}) con precio ${formatPrice(car.price)}.\n\n` +
+      `Especificaciones:\n` +
+      `- Motor: ${car.specs.engine}\n` +
+      `- Transmisión: ${car.specs.transmission}\n` +
+      `- Combustible: ${car.specs.fuelType}\n` +
+      `- Kilometraje: ${car.specs.mileage.toLocaleString()} km\n\n` +
+      `Puede ver las fotos y más detalles aquí: ${carUrl}\n\n` +
+      `¿Podría darme más información sobre este vehículo?`
+    );
+    const whatsappUrl = `https://wa.me/+34600000000?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    toast.success('Abriendo WhatsApp con la información del vehículo', {
+      description: 'Incluye enlace a las imágenes y especificaciones.'
+    });
+  };
   
   return (
     <Layout>
+      {/* Añadimos el botón flotante de WhatsApp */}
+      <WhatsAppFloatingButton car={car} />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         <Button 
           onClick={() => navigate(-1)}
           variant="ghost"
-          className="mb-6 flex items-center text-automotive-600"
+          className="mb-6 flex items-center text-automotive-600 transition-all hover:translate-x-[-5px]"
         >
           <ChevronLeft className="mr-2 h-5 w-5" />
           Volver
@@ -82,20 +141,20 @@ const CarDetailPage = () => {
                   <img
                     src={car.images[activeImageIndex]}
                     alt={`${car.brand} ${car.model}`}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </AspectRatio>
               </div>
               
               <div className="grid grid-cols-3 gap-2 p-4">
-                {car.images.map((image, index) => (
+                {car.images.map((image: string, index: number) => (
                   <div
                     key={index}
                     className={cn(
-                      "cursor-pointer rounded-md overflow-hidden transition-all duration-200 hover:opacity-90",
+                      "cursor-pointer rounded-md overflow-hidden transition-all duration-300 hover:opacity-100",
                       index === activeImageIndex 
                         ? "ring-2 ring-automotive-600 scale-[0.98]" 
-                        : "opacity-80 hover:scale-95"
+                        : "opacity-70 hover:scale-95"
                     )}
                     onClick={() => setActiveImageIndex(index)}
                   >
@@ -138,7 +197,7 @@ const CarDetailPage = () => {
             </div>
             
             {/* Specs */}
-            <Card className="bg-gray-50">
+            <Card className="bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
               <CardContent className="p-4 space-y-4">
                 <h2 className="text-lg font-semibold">Especificaciones</h2>
                 <div className="grid grid-cols-2 gap-y-4">
@@ -174,8 +233,8 @@ const CarDetailPage = () => {
             <div>
               <h2 className="text-lg font-semibold mb-4">Características</h2>
               <ul className="grid grid-cols-2 gap-y-2 gap-x-4">
-                {car.features.map((feature, index) => (
-                  <li key={index} className="flex items-center">
+                {car.features.map((feature: string, index: number) => (
+                  <li key={index} className="flex items-center transition-transform duration-300 hover:translate-x-1">
                     <svg className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -190,26 +249,26 @@ const CarDetailPage = () => {
               <Button
                 onClick={handleAddToCart}
                 disabled={car.stock === 0}
-                className="flex-1 bg-automotive-600 hover:bg-automotive-700 shadow-sm transition-all hover:shadow-md"
+                className="flex-1 bg-automotive-600 hover:bg-automotive-700 shadow-sm transition-all hover:shadow-md hover:translate-y-[-2px]"
                 aria-label="Añadir al carrito"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Añadir al carrito
               </Button>
               <Button
-                onClick={handleWhatsApp}
-                className="flex-1 bg-green-600 hover:bg-green-700 shadow-sm transition-all hover:shadow-md"
-                aria-label="Contactar por WhatsApp"
+                onClick={handleWhatsAppWithImage}
+                className="flex-1 bg-green-600 hover:bg-green-700 shadow-sm transition-all hover:shadow-md hover:translate-y-[-2px]"
+                aria-label="Contactar por WhatsApp con imagen"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
-                Contactar por WhatsApp
+                WhatsApp con detalles
               </Button>
             </div>
             <Button
               onClick={handleOrder}
               disabled={car.stock === 0}
               variant="outline"
-              className="w-full border-automotive-600 text-automotive-700 hover:bg-automotive-50"
+              className="w-full border-automotive-600 text-automotive-700 hover:bg-automotive-50 transition-all hover:shadow-md"
               aria-label="Hacer un encargo"
             >
               Hacer un encargo
