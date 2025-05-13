@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
@@ -13,13 +12,13 @@ import {
   Wrench
 } from 'lucide-react';
 import { Button } from './ui/button';
-import { useMobile } from '../hooks/use-mobile';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const Header: React.FC = () => {
   const location = useLocation();
   const { cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
