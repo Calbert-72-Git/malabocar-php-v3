@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { getFilteredCars, getAvailableBrands } from '../data/cars';
 import { formatPrice } from '../utils/formatters';
@@ -9,6 +8,10 @@ import { Input } from '../components/ui/input';
 import { Slider } from '../components/ui/slider';
 import { Card, CardContent } from '../components/ui/card';
 import { AspectRatio } from '../components/ui/aspect-ratio';
+import { Car } from '../types/car';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
+import { ShareVehicleButton } from '../components/car-detail/ShareVehicleButton';
 
 const CarsPage = () => {
   const [search, setSearch] = useState('');
@@ -17,6 +20,7 @@ const CarsPage = () => {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [availableBrands, setAvailableBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [activeTab, setActiveTab] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,9 +33,68 @@ const CarsPage = () => {
     setMaxPrice(priceRange[1]);
   }, [priceRange]);
 
-  // Filtrar los coches según los criterios
-  const filteredCars = getFilteredCars(search, minPrice, maxPrice, selectedBrand);
+  // Get all cars and apply filters
+  const allCars = getFilteredCars(search, minPrice, maxPrice, selectedBrand);
   
+  // Group cars by category
+  const getCarsByCategory = (category: string): Car[] => {
+    switch (category) {
+      case 'recent':
+        // Sort by year, newer first
+        return [...allCars].sort((a, b) => b.year - a.year).slice(0, 6);
+      case 'popular':
+        // For demo purposes, just use stock as popularity indicator (lower stock means more popular)
+        return [...allCars].sort((a, b) => a.stock - b.stock).slice(0, 6);
+      case 'orders':
+        // For demo purposes, show cars with lower stock
+        return allCars.filter(car => car.stock <= 2);
+      case 'all':
+      default:
+        return allCars;
+    }
+  };
+  
+  const filteredCars = getCarsByCategory(activeTab);
+  
+  const CarCard = ({ car }: { car: Car }) => (
+    <Card
+      className="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 cursor-pointer relative"
+      onClick={() => navigate(`/car/${car.id}`)}
+    >
+      <CardContent className="p-0">
+        <AspectRatio ratio={4 / 3}>
+          <img
+            src={car.images[0]}
+            alt={`${car.brand} ${car.model}`}
+            className="object-cover w-full h-full"
+          />
+        </AspectRatio>
+        <div className="p-4">
+          <h2 className="text-lg font-semibold text-gray-800">{car.brand} {car.model}</h2>
+          <p className="text-gray-600">{car.year}</p>
+          <p className="text-xl font-bold text-automotive-600">{formatPrice(car.price)}</p>
+          
+          <div className="mt-4 flex items-center justify-between">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 mr-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/car/${car.id}`);
+              }}
+            >
+              Ver detalles
+            </Button>
+            <div onClick={(e) => e.stopPropagation()} className="flex-shrink-0">
+              <ShareVehicleButton car={car} variant="icon" />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <Layout>
       <div className="container mx-auto p-4">
@@ -88,31 +151,61 @@ const CarsPage = () => {
           </div>
         </div>
 
-        {/* Car List */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredCars.map((car) => (
-            <Card
-              key={car.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
-              onClick={() => navigate(`/car/${car.id}`)}
-            >
-              <CardContent className="p-0">
-                <AspectRatio ratio={4 / 3}>
-                  <img
-                    src={car.images[0]}
-                    alt={`${car.brand} ${car.model}`}
-                    className="object-cover w-full h-full"
-                  />
-                </AspectRatio>
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold text-gray-800">{car.brand} {car.model}</h2>
-                  <p className="text-gray-600">{car.year}</p>
-                  <p className="text-xl font-bold text-automotive-600">{formatPrice(car.price)}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Car Categories Tabs */}
+        <Tabs 
+          defaultValue="all" 
+          className="mb-8"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="recent">Más recientes</TabsTrigger>
+            <TabsTrigger value="popular">Más vendidos</TabsTrigger>
+            <TabsTrigger value="orders">Pedidos en curso</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="mt-0">
+            <h2 className="text-xl font-semibold mb-4">Todos los vehículos</h2>
+          </TabsContent>
+          
+          <TabsContent value="recent" className="mt-0">
+            <h2 className="text-xl font-semibold mb-4">Vehículos más recientes</h2>
+          </TabsContent>
+          
+          <TabsContent value="popular" className="mt-0">
+            <h2 className="text-xl font-semibold mb-4">Vehículos más vendidos</h2>
+          </TabsContent>
+          
+          <TabsContent value="orders" className="mt-0">
+            <h2 className="text-xl font-semibold mb-4">Pedidos en curso (stock limitado)</h2>
+          </TabsContent>
+
+          {/* Car List - Same for all tabs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredCars.length > 0 ? (
+              filteredCars.map((car) => (
+                <CarCard key={car.id} car={car} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-500">No se encontraron vehículos que coincidan con los criterios de búsqueda.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => {
+                    setSearch('');
+                    setSelectedBrand('');
+                    setPriceRange([0, 1000000]);
+                    setActiveTab('all');
+                  }}
+                >
+                  Reiniciar filtros
+                </Button>
+              </div>
+            )}
+          </div>
+        </Tabs>
       </div>
     </Layout>
   );

@@ -2,137 +2,123 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { 
+  ShoppingCart, 
+  Menu, 
+  X,
+  Home,
+  Car,
+  ShoppingBag,
+  Info,
+  Wrench
+} from 'lucide-react';
 import { Button } from './ui/button';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { useMobile } from '../hooks/use-mobile';
 
-const Header = () => {
-  const { getCartCount } = useCart();
+const Header: React.FC = () => {
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { cartItems } = useCart();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isMobile = useMobile();
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+  const closeMenu = () => {
+    setMenuOpen(false);
   };
 
-  const cartCount = getCartCount();
+  const isActive = (path: string) => location.pathname === path;
+
+  const navItems = [
+    { path: '/', label: 'Inicio', icon: Home },
+    { path: '/cars', label: 'Coches', icon: Car },
+    { path: '/orders', label: 'Encargos', icon: ShoppingBag },
+    { path: '/services', label: 'Servicios', icon: Wrench },
+    { path: '/about', label: 'Sobre Nosotros', icon: Info }
+  ];
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="bg-white shadow-sm sticky top-0 z-40">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-automotive-700">AutoVenta</h1>
+            <Link to="/" className="text-xl font-bold text-automotive-600">
+              AutoVenta
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:ml-6 md:flex md:space-x-8">
-            <Link
-              to="/"
-              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                isActive('/') 
-                  ? 'border-automotive-600 text-gray-900' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/cars"
-              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                isActive('/cars') 
-                  ? 'border-automotive-600 text-gray-900' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Coches
-            </Link>
-            <Link
-              to="/orders"
-              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                isActive('/orders') 
-                  ? 'border-automotive-600 text-gray-900' 
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
-              Encargos
-            </Link>
+          <nav className="hidden md:flex space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center px-1 py-2 text-sm font-medium transition-colors relative ${
+                  isActive(item.path)
+                    ? 'text-automotive-600'
+                    : 'text-gray-600 hover:text-automotive-500'
+                }`}
+              >
+                {item.label}
+                {isActive(item.path) && (
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-automotive-600" />
+                )}
+              </Link>
+            ))}
           </nav>
 
-          <div className="hidden md:flex items-center">
-            <Link to="/cart">
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-automotive-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
+          <div className="flex items-center">
+            <Link to="/cart" className="relative p-2">
+              <ShoppingCart className="h-5 w-5 text-gray-600" />
+              {totalItems > 0 && (
+                <span className="absolute top-0 right-0 bg-automotive-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </Link>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="flex md:hidden">
-            <Link to="/cart" className="mr-2">
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-automotive-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            <Button variant="outline" size="icon" onClick={toggleMobileMenu}>
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMenu}
+              className="md:hidden ml-2"
+            >
+              {menuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="pt-2 pb-3 space-y-1">
-            <Link
-              to="/"
-              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                isActive('/')
-                  ? 'bg-automotive-50 border-automotive-600 text-automotive-700'
-                  : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/cars"
-              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                isActive('/cars')
-                  ? 'bg-automotive-50 border-automotive-600 text-automotive-700'
-                  : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Coches
-            </Link>
-            <Link
-              to="/orders"
-              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                isActive('/orders')
-                  ? 'bg-automotive-50 border-automotive-600 text-automotive-700'
-                  : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Encargos
-            </Link>
+      {/* Mobile Navigation */}
+      {menuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200 animate-fade-in">
+          <div className="container mx-auto px-4 py-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center py-3 text-sm font-medium ${
+                    isActive(item.path)
+                      ? 'text-automotive-600'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={closeMenu}
+                >
+                  <Icon className="h-5 w-5 mr-2" />
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

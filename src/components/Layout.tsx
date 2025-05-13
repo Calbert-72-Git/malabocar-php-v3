@@ -2,6 +2,7 @@
 import React, { ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import GlobalWhatsAppButton from './GlobalWhatsAppButton';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
       <Footer />
+      <GlobalWhatsAppButton />
     </div>
   );
 };
