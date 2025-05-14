@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from './ui/button';
 import { MessageCircle } from 'lucide-react';
@@ -48,3 +49,4 @@ export const GlobalWhatsAppButton = ({ variant = 'floating' }: GlobalWhatsAppBut
 };
 
 export default GlobalWhatsAppButton;
+

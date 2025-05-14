@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { getCarById } from '../data/cars';
+import { getCarById, getNextCarId } from '../data/cars';
 import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
 import { ChevronLeft } from 'lucide-react';
@@ -15,6 +15,7 @@ import { CarSpecifications } from '../components/car-detail/CarSpecifications';
 import { CarFeatures } from '../components/car-detail/CarFeatures';
 import { CarActionButtons } from '../components/car-detail/CarActionButtons';
 import { CarHeader } from '../components/car-detail/CarHeader';
+import { NextCarButton } from '../components/car-detail/NextCarButton';
 
 // Importando la función de utilidad
 import { formatPrice } from '../utils/formatters';
@@ -26,6 +27,8 @@ const CarDetailPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   
   const car = getCarById(id || '');
+  // Obtener el ID del siguiente coche
+  const nextCarId = getNextCarId(id || '');
   
   if (!car) {
     return (
@@ -56,6 +59,9 @@ const CarDetailPage = () => {
     <Layout>
       {/* Botón flotante de WhatsApp */}
       <WhatsAppButton car={car} variant="floating" />
+      
+      {/* Botón para ir al siguiente vehículo */}
+      <NextCarButton currentCarId={id || ''} nextCarId={nextCarId} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         <Button 
