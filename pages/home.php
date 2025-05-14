@@ -1,8 +1,16 @@
 
 <?php
+// Incluir funciones necesarias
+include_once 'includes/car_functions.php';
+
 // Obtener algunos coches destacados
-$featuredCars = array_slice(getAllCars(), 0, 3);
-$brands = getAvailableBrands();
+// Verificar si getAllCars() devuelve un array
+$allCars = getAllCars();
+$featuredCars = is_array($allCars) ? array_slice($allCars, 0, 3) : [];
+
+// Verificar si getAvailableBrands() devuelve un array
+$brandsResult = getAvailableBrands();
+$brands = is_array($brandsResult) ? $brandsResult : [];
 ?>
 
 <div class="hero" style="background-image: url('https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1470&auto=format&fit=crop'); background-size: cover; background-position: center; padding: 4rem 0;">
@@ -19,10 +27,19 @@ $brands = getAvailableBrands();
   <h2 class="section-title" style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">Vehículos destacados</h2>
   
   <div class="car-grid">
+    <?php if (empty($featuredCars)): ?>
+    <div class="empty-state" style="text-align: center; padding: 2rem; width: 100%;">
+      <p>No hay vehículos disponibles en este momento.</p>
+    </div>
+    <?php else: ?>
     <?php foreach ($featuredCars as $car): ?>
     <div class="car-card">
       <div class="car-image-container">
+        <?php if (!empty($car['images']) && is_array($car['images']) && isset($car['images'][0])): ?>
         <img src="<?php echo $car['images'][0]; ?>" alt="<?php echo $car['brand'] . ' ' . $car['model']; ?>">
+        <?php else: ?>
+        <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1470&auto=format&fit=crop" alt="Imagen no disponible">
+        <?php endif; ?>
       </div>
       <div class="car-info">
         <h3 class="car-title"><?php echo $car['brand'] . ' ' . $car['model']; ?></h3>
@@ -51,6 +68,7 @@ $brands = getAvailableBrands();
       </div>
     </div>
     <?php endforeach; ?>
+    <?php endif; ?>
   </div>
   
   <div style="text-align: center; margin-top: 2rem;">
@@ -63,11 +81,17 @@ $brands = getAvailableBrands();
     <h2 class="section-title" style="text-align: center; font-size: 2rem; margin-bottom: 2rem;">Nuestras marcas</h2>
     
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+      <?php if (empty($brands)): ?>
+      <div style="text-align: center; padding: 1rem;">
+        <p>No hay marcas disponibles en este momento.</p>
+      </div>
+      <?php else: ?>
       <?php foreach ($brands as $brand): ?>
       <div style="text-align: center; padding: 1rem;">
         <div style="font-weight: bold; font-size: 1.25rem;"><?php echo $brand; ?></div>
       </div>
       <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </div>
 </section>
