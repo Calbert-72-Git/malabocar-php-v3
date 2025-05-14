@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { getAllCars } from '../data/cars';
-import CarCard from '../components/CarCard';
+import { CarCard } from '../components/cars/CarCard';
 
 const Index = () => {
   // Get 3 featured cars
