@@ -1,5 +1,6 @@
 
 import React from 'react';
+import styles from './TestimonialsSection.module.css';
 
 interface Testimonial {
   text: string;
@@ -31,18 +32,18 @@ const testimonials: Testimonial[] = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+    <section className={styles.section}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>
             Lo que dicen nuestros clientes
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+          <p className={styles.description}>
             Descubra por qué nuestros clientes confían en nosotros.
           </p>
         </div>
         
-        <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className={styles.testimonialGrid}>
           {testimonials.map((testimonial, index) => (
             <TestimonialCard key={index} testimonial={testimonial} />
           ))}
@@ -54,17 +55,15 @@ const TestimonialsSection = () => {
 
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    <div className="rounded-lg bg-gray-50 p-6 shadow-sm">
-      <p className="text-gray-600">"{testimonial.text}"</p>
-      <div className="mt-4 flex items-center">
-        <div className="flex-shrink-0">
-          <div className="h-10 w-10 rounded-full bg-automotive-200 flex items-center justify-center text-automotive-600 font-semibold">
-            {testimonial.initials}
-          </div>
+    <div className={styles.testimonialCard}>
+      <p className={styles.testimonialText}>"{testimonial.text}"</p>
+      <div className={styles.testimonialProfile}>
+        <div className={styles.testimonialInitials}>
+          {testimonial.initials}
         </div>
-        <div className="ml-3">
-          <p className="text-sm font-medium text-gray-900">{testimonial.name}</p>
-          <p className="text-sm text-gray-500">{testimonial.location}</p>
+        <div className={styles.testimonialInfo}>
+          <p className={styles.testimonialName}>{testimonial.name}</p>
+          <p className={styles.testimonialLocation}>{testimonial.location}</p>
         </div>
       </div>
     </div>

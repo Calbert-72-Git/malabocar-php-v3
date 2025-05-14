@@ -1,0 +1,75 @@
+
+.ctaSection {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  background-color: var(--automotive-700, #4c1d95);
+}
+
+.container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.content {
+  display: block;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: white;
+}
+
+.buttonGroup {
+  margin-top: 2rem;
+  display: flex;
+}
+
+.primaryButton {
+  color: var(--automotive-700, #4c1d95);
+  background-color: white;
+}
+
+.primaryButton:hover {
+  color: var(--automotive-800, #5b21b6);
+  background-color: #f9fafb;
+}
+
+.secondaryButton {
+  margin-left: 1rem;
+  background-color: var(--automotive-800, #5b21b6);
+  color: white;
+}
+
+.secondaryButton:hover {
+  background-color: var(--automotive-600, #7c3aed);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .buttonGroup {
+    margin-top: 0;
+  }
+}
