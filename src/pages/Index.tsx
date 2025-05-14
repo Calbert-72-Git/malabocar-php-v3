@@ -3,12 +3,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
-import { cars } from '../data/cars';
+import { getAllCars } from '../data/cars';
 import CarCard from '../components/CarCard';
 
 const Index = () => {
   // Get 3 featured cars
-  const featuredCars = cars.slice(0, 3);
+  const featuredCars = getAllCars().slice(0, 3);
   
   return (
     <Layout>

@@ -1,6 +1,6 @@
 
 import { Car } from "../types/car";
-import { cars } from "./mockData";
+import { cars } from "./cars";
 
 /**
  * Obtiene un coche por su ID
@@ -11,6 +11,11 @@ export const getCarById = (id: string): Car | undefined => {
 
 /**
  * Filtra coches según criterios
+ * @param search Cadena de búsqueda para marca o modelo
+ * @param minPrice Precio mínimo
+ * @param maxPrice Precio máximo
+ * @param brand Marca específica (opcional)
+ * @returns Lista de coches filtrados
  */
 export const getFilteredCars = (
   search: string = "", 

@@ -1,5 +1,9 @@
+
 import { Car } from '../types/car';
-import { cars } from './mockData';
+import { cars as mockCars } from './mockData';
+
+// Exportamos la variable cars para que otros archivos puedan importarla
+export const cars = mockCars;
 
 /**
  * Obtiene un coche por su ID
