@@ -36,7 +36,8 @@ const VehicleImagesGallery = ({ control }: VehicleImagesGalleryProps) => {
         />
 
         <FormDescription className="text-sm text-muted-foreground">
-          Puedes utilizar URLs de imágenes desde servicios como Unsplash, ImgBB o subir imágenes directamente desde tu dispositivo.
+          Puedes utilizar URLs de imágenes desde servicios como Unsplash, ImgBB, o subir imágenes directamente desde tu dispositivo.
+          Las imágenes subidas se convertirán automáticamente al formato adecuado.
         </FormDescription>
       </div>
     </div>

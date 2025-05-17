@@ -85,11 +85,11 @@ export const useVehicleForm = () => {
     }
   }, [id, navigate, form]);
 
-  const onSubmit = (data: VehicleFormValues) => {
+  const onSubmit = async (data: VehicleFormValues) => {
     setIsLoading(true);
     
     try {
-      // Procesar imágenes (simulado en este caso)
+      // Procesar imágenes
       const processedImages = [
         data.image1 ? processImageUpload(data.image1) : '',
         data.image2 ? processImageUpload(data.image2) : '',

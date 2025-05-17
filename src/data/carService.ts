@@ -89,10 +89,24 @@ export const generateCarId = (): string => {
 /**
  * Procesa y guarda una imagen (en un sistema real, esto subiría la imagen a un servidor)
  * @param imageData Datos de la imagen en formato base64 o URL
- * @returns URL de la imagen guardada
+ * @returns URL de la imagen procesada
  */
 export const processImageUpload = (imageData: string): string => {
-  // En una implementación real, aquí se enviaría la imagen a un servidor y se devolvería la URL
-  // Para esta demostración, simplemente devolvemos la misma cadena, que puede ser una URL o datos base64
-  return imageData;
+  // Si no hay datos, devolver string vacío
+  if (!imageData) return '';
+  
+  // Si es una URL válida, devolverla directamente
+  if (imageData.startsWith('http') || imageData.startsWith('https')) {
+    return imageData;
+  }
+  
+  // Si es una imagen en base64, en una implementación real, aquí se enviaría a un servidor
+  // y se devolvería la URL. Para esta demostración, simplemente devolvemos los datos base64.
+  if (imageData.startsWith('data:image/')) {
+    // En un entorno de producción, aquí procesaríamos la imagen y obtendríamos una URL
+    return imageData;
+  }
+  
+  // Si no es ninguno de los casos anteriores, devolver un placeholder
+  return 'https://via.placeholder.com/400x300?text=Imagen+no+disponible';
 };
