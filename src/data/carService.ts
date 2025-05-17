@@ -85,3 +85,14 @@ export const generateCarId = (): string => {
   const lastId = Math.max(...cars.map(car => parseInt(car.id)), 0);
   return (lastId + 1).toString();
 };
+
+/**
+ * Procesa y guarda una imagen (en un sistema real, esto subiría la imagen a un servidor)
+ * @param imageData Datos de la imagen en formato base64 o URL
+ * @returns URL de la imagen guardada
+ */
+export const processImageUpload = (imageData: string): string => {
+  // En una implementación real, aquí se enviaría la imagen a un servidor y se devolvería la URL
+  // Para esta demostración, simplemente devolvemos la misma cadena, que puede ser una URL o datos base64
+  return imageData;
+};

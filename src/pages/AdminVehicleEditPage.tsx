@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { getCarById } from '../data/cars';
 import { Car } from '../types/car';
+import { Upload } from 'lucide-react';
 
 // Schema de validación para el formulario
 const vehicleFormSchema = z.object({
@@ -43,6 +44,9 @@ const AdminVehicleEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
   const [vehicle, setVehicle] = useState<Car | null>(null);
+  const [imagePreview1, setImagePreview1] = useState<string | null>(null);
+  const [imagePreview2, setImagePreview2] = useState<string | null>(null);
+  const [imagePreview3, setImagePreview3] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -100,6 +104,33 @@ const AdminVehicleEditPage = () => {
       });
     }
   }, [vehicle, form]);
+
+  // Función para manejar la carga de archivos
+  const handleFileUpload = (fieldName: 'image1' | 'image2' | 'image3', file: File) => {
+    if (!file) return;
+    
+    // Verificamos que sea una imagen
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo debe ser una imagen');
+      return;
+    }
+    
+    // Convertimos la imagen a una URL de datos para previsualización
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      
+      // Actualizamos la previsualización dependiendo del campo
+      if (fieldName === 'image1') setImagePreview1(result);
+      if (fieldName === 'image2') setImagePreview2(result);
+      if (fieldName === 'image3') setImagePreview3(result);
+      
+      // Establecemos el valor en el formulario
+      form.setValue(fieldName, result);
+    };
+    
+    reader.readAsDataURL(file);
+  };
 
   const onSubmit = (data: VehicleFormValues) => {
     setIsLoading(true);
@@ -332,7 +363,7 @@ const AdminVehicleEditPage = () => {
 
                   <div className="bg-muted/50 p-6 rounded-lg">
                     <h3 className="text-lg font-medium mb-4">Imágenes del vehículo</h3>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <FormField
                         control={form.control}
                         name="image1"
@@ -340,15 +371,39 @@ const AdminVehicleEditPage = () => {
                           <FormItem>
                             <FormLabel>Imagen principal</FormLabel>
                             <FormControl>
-                              <div className="space-y-2">
-                                <Input
-                                  placeholder="URL de la imagen (ej. https://images.unsplash.com/...)"
-                                  {...field}
-                                />
-                                {field.value && (
+                              <div className="space-y-4">
+                                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                  <Input
+                                    placeholder="URL de la imagen (ej. https://images.unsplash.com/...)"
+                                    className="flex-grow"
+                                    {...field}
+                                  />
+                                  <div className="relative">
+                                    <input
+                                      type="file"
+                                      id="upload-image1"
+                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleFileUpload('image1', e.target.files[0]);
+                                        }
+                                      }}
+                                      accept="image/*"
+                                    />
+                                    <Button 
+                                      type="button" 
+                                      variant="outline"
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Upload size={16} />
+                                      Subir imagen
+                                    </Button>
+                                  </div>
+                                </div>
+                                {(field.value || imagePreview1) && (
                                   <div className="h-40 w-full overflow-hidden rounded-md border">
                                     <img
-                                      src={field.value}
+                                      src={imagePreview1 || field.value}
                                       alt="Imagen principal"
                                       className="h-full w-full object-cover"
                                       onError={(e) => {
@@ -372,16 +427,40 @@ const AdminVehicleEditPage = () => {
                           <FormItem>
                             <FormLabel>Imagen secundaria 1</FormLabel>
                             <FormControl>
-                              <div className="space-y-2">
-                                <Input
-                                  placeholder="URL de la imagen (opcional)"
-                                  {...field}
-                                  value={field.value || ''}
-                                />
-                                {field.value && (
+                              <div className="space-y-4">
+                                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                  <Input
+                                    placeholder="URL de la imagen (opcional)"
+                                    className="flex-grow"
+                                    {...field}
+                                    value={field.value || ''}
+                                  />
+                                  <div className="relative">
+                                    <input
+                                      type="file"
+                                      id="upload-image2"
+                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleFileUpload('image2', e.target.files[0]);
+                                        }
+                                      }}
+                                      accept="image/*"
+                                    />
+                                    <Button 
+                                      type="button" 
+                                      variant="outline"
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Upload size={16} />
+                                      Subir imagen
+                                    </Button>
+                                  </div>
+                                </div>
+                                {(field.value || imagePreview2) && (
                                   <div className="h-40 w-full overflow-hidden rounded-md border">
                                     <img
-                                      src={field.value}
+                                      src={imagePreview2 || field.value}
                                       alt="Imagen secundaria 1"
                                       className="h-full w-full object-cover"
                                       onError={(e) => {
@@ -405,16 +484,40 @@ const AdminVehicleEditPage = () => {
                           <FormItem>
                             <FormLabel>Imagen secundaria 2</FormLabel>
                             <FormControl>
-                              <div className="space-y-2">
-                                <Input
-                                  placeholder="URL de la imagen (opcional)"
-                                  {...field}
-                                  value={field.value || ''}
-                                />
-                                {field.value && (
+                              <div className="space-y-4">
+                                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                  <Input
+                                    placeholder="URL de la imagen (opcional)"
+                                    className="flex-grow"
+                                    {...field}
+                                    value={field.value || ''}
+                                  />
+                                  <div className="relative">
+                                    <input
+                                      type="file"
+                                      id="upload-image3"
+                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleFileUpload('image3', e.target.files[0]);
+                                        }
+                                      }}
+                                      accept="image/*"
+                                    />
+                                    <Button 
+                                      type="button" 
+                                      variant="outline"
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Upload size={16} />
+                                      Subir imagen
+                                    </Button>
+                                  </div>
+                                </div>
+                                {(field.value || imagePreview3) && (
                                   <div className="h-40 w-full overflow-hidden rounded-md border">
                                     <img
-                                      src={field.value}
+                                      src={imagePreview3 || field.value}
                                       alt="Imagen secundaria 2"
                                       className="h-full w-full object-cover"
                                       onError={(e) => {
@@ -432,7 +535,7 @@ const AdminVehicleEditPage = () => {
                       />
 
                       <FormDescription className="text-sm text-muted-foreground">
-                        Puedes utilizar URLs de imágenes desde servicios como Unsplash, ImgBB o cualquier otro servicio de alojamiento de imágenes.
+                        Puedes utilizar URLs de imágenes desde servicios como Unsplash, ImgBB o subir imágenes directamente desde tu dispositivo.
                       </FormDescription>
                     </div>
                   </div>
