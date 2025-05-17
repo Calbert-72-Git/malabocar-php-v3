@@ -3,6 +3,17 @@
 CREATE DATABASE IF NOT EXISTS malabocar;
 USE malabocar;
 
+-- Crear tabla de administradores
+CREATE TABLE IF NOT EXISTS admins (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  name VARCHAR(100),
+  email VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_login TIMESTAMP NULL
+);
+
 -- Crear tabla de coches
 CREATE TABLE IF NOT EXISTS cars (
   id VARCHAR(50) PRIMARY KEY,
@@ -70,6 +81,11 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE
 );
 
+-- Insertar usuario administrador predeterminado
+-- Nota: En producción, se debe usar una contraseña hasheada
+INSERT IGNORE INTO admins (username, password, name, email) 
+VALUES ('admin', 'admin123', 'Administrador Principal', 'admin@malabocar.com');
+
 -- Insertar datos de ejemplo para la primera ejecución
 -- Mercedes-Benz C-Class
 INSERT IGNORE INTO cars (id, brand, model, year, price, description, stock) VALUES 
@@ -110,3 +126,23 @@ INSERT IGNORE INTO car_features (car_id, feature_name) VALUES
 
 INSERT IGNORE INTO car_specs (car_id, engine, transmission, fuel_type, mileage, exterior_color, interior_color) VALUES 
 ('2', '3.0L Turbocharged I6', '8-Speed Automatic', 'Gasoline', 0, 'Alpine White', 'Cognac');
+
+-- Audi A6
+INSERT IGNORE INTO cars (id, brand, model, year, price, description, stock) VALUES 
+('3', 'Audi', 'A6', 2023, 58000, 'The Audi A6 is an executive car made by the German automaker Audi. The A6 has been built in five generations and is based on the Volkswagen Group C platform. All generations of the A6 have offered either front-wheel drive or Torsen-based four-wheel drive.', 4);
+
+INSERT IGNORE INTO car_images (car_id, image_url, position) VALUES 
+('3', 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=1469&auto=format&fit=crop', 0),
+('3', 'https://images.unsplash.com/photo-1566473965997-3de9c817e938?q=80&w=1470&auto=format&fit=crop', 1),
+('3', 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=1374&auto=format&fit=crop', 2);
+
+INSERT IGNORE INTO car_features (car_id, feature_name) VALUES 
+('3', 'MMI Navigation Plus'),
+('3', 'Audi Virtual Cockpit'),
+('3', 'Bang & Olufsen Sound'),
+('3', 'Lane Departure Warning'),
+('3', 'Heated & Ventilated Seats'),
+('3', 'Quattro All-Wheel Drive');
+
+INSERT IGNORE INTO car_specs (car_id, engine, transmission, fuel_type, mileage, exterior_color, interior_color) VALUES 
+('3', '3.0L V6 TFSI', '7-Speed S tronic', 'Gasoline', 0, 'Daytona Gray', 'Black');

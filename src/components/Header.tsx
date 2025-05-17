@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
@@ -10,7 +9,8 @@ import {
   Car,
   ShoppingBag,
   Info,
-  Wrench
+  Wrench,
+  Settings
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -39,7 +39,8 @@ const Header: React.FC = () => {
     { path: '/cars', label: 'Coches', icon: Car },
     { path: '/orders', label: 'Encargos', icon: ShoppingBag },
     { path: '/services', label: 'Servicios', icon: Wrench },
-    { path: '/about', label: 'Sobre Nosotros', icon: Info }
+    { path: '/about', label: 'Sobre Nosotros', icon: Info },
+    { path: '/admin/login', label: 'Administración', icon: Settings }
   ];
 
   return (

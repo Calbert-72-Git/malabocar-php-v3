@@ -28,6 +28,7 @@ function App() {
     <CartProvider>
       <BrowserRouter>
         <Routes>
+          {/* Rutas públicas */}
           <Route path="/" element={<Index />} />
           <Route path="/cars" element={<CarsPage />} />
           <Route path="/car/:id" element={<CarDetailPage />} />
