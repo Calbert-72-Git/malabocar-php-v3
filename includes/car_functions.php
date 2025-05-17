@@ -353,7 +353,7 @@ function getAvailableBrands() {
 
 // Formatear precio
 function formatPrice($price) {
-  return number_format($price, 0, ',', '.') . ' €';
+  return number_format($price, 0, ',', '.') . ' FCFA';
 }
 
 ?>

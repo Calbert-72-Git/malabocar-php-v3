@@ -6,18 +6,11 @@ import { useCart } from '../contexts/CartContext';
 import { Button } from '../components/ui/button';
 import { Trash2, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatPrice } from '../utils/formatters';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
   const navigate = useNavigate();
-  
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
   
   const handleCheckout = () => {
     navigate('/orders');

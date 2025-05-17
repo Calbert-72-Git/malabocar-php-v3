@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Car } from '../../types/car';
+import { formatPrice } from '../../utils/formatters';
 
 interface CarHeaderProps {
   car: Car;
-  formatPrice: (price: number) => string;
 }
 
-export const CarHeader = ({ car, formatPrice }: CarHeaderProps) => {
+export const CarHeader = ({ car }: CarHeaderProps) => {
   return (
     <div className="space-y-2">
       <h1 className="text-3xl font-bold mb-2 text-automotive-800">
