@@ -17,9 +17,6 @@ import { CarActionButtons } from '../components/car-detail/CarActionButtons';
 import { CarHeader } from '../components/car-detail/CarHeader';
 import { NextCarButton } from '../components/car-detail/NextCarButton';
 
-// Importando la función de utilidad
-import { formatPrice } from '../utils/formatters';
-
 const CarDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -86,7 +83,7 @@ const CarDetailPage = () => {
           {/* Sección de detalles */}
           <div className="space-y-6">
             {/* Encabezado del coche */}
-            <CarHeader car={car} formatPrice={formatPrice} />
+            <CarHeader car={car} />
             
             {/* Descripción */}
             <div className="prose prose-sm">

@@ -239,9 +239,9 @@ function updatePriceRange() {
 }
 
 function formatPrice(price) {
-  return new Intl.NumberFormat('es-ES', {
+  return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR',
+    currency: 'XAF',
     minimumFractionDigits: 0
   }).format(price);
 }
