@@ -27,8 +27,21 @@ if (empty($_FILES['image']) || !isset($_FILES['image'])) {
     exit;
 }
 
+// Imprimir los detalles de la imagen para depuración
+error_log(print_r($_FILES['image'], true));
+
+// Asegurar que existe el directorio de destino
+$upload_dir = '../uploads/cars/';
+if (!file_exists($upload_dir)) {
+    if (!mkdir($upload_dir, 0755, true)) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'No se pudo crear el directorio de destino.']);
+        exit;
+    }
+}
+
 // Procesar la subida de la imagen
-$upload_result = uploadImage($_FILES['image'], '../uploads/cars/');
+$upload_result = uploadImage($_FILES['image'], $upload_dir);
 
 // Si se ha enviado un car_id, actualizar la referencia en la base de datos
 if ($upload_result['success'] && isset($_POST['car_id']) && isset($_POST['position'])) {
@@ -37,25 +50,37 @@ if ($upload_result['success'] && isset($_POST['car_id']) && isset($_POST['positi
     $image_url = mysqli_real_escape_string($conn, $upload_result['url']);
     
     // Verificar si ya existe una imagen en esa posición para este coche
-    $check_query = "SELECT id FROM car_images WHERE car_id = '$car_id' AND position = $position";
+    $check_query = "SELECT id, image_url FROM car_images WHERE car_id = '$car_id' AND position = $position";
     $check_result = mysqli_query($conn, $check_query);
     
     if (mysqli_num_rows($check_result) > 0) {
-        // Si existe, actualizar la referencia
+        // Si existe, actualizar la referencia y eliminar la imagen anterior
         $row = mysqli_fetch_assoc($check_result);
         $image_id = $row['id'];
+        $old_image_url = $row['image_url'];
+        
         $update_query = "UPDATE car_images SET image_url = '$image_url' WHERE id = $image_id";
-        if (!mysqli_query($conn, $update_query)) {
-            $upload_result['message'] .= " Pero hubo un error al actualizar la referencia en la base de datos.";
+        if (mysqli_query($conn, $update_query)) {
+            // Intentar eliminar la imagen anterior
+            if (file_exists($old_image_url)) {
+                unlink($old_image_url);
+            }
+        } else {
+            $upload_result['message'] .= " Pero hubo un error al actualizar la referencia en la base de datos: " . mysqli_error($conn);
             $upload_result['success'] = false;
         }
     } else {
         // Si no existe, insertar nueva referencia
         $insert_query = "INSERT INTO car_images (car_id, image_url, position) VALUES ('$car_id', '$image_url', $position)";
         if (!mysqli_query($conn, $insert_query)) {
-            $upload_result['message'] .= " Pero hubo un error al guardar la referencia en la base de datos.";
+            $upload_result['message'] .= " Pero hubo un error al guardar la referencia en la base de datos: " . mysqli_error($conn);
             $upload_result['success'] = false;
         }
+    }
+
+    // Agregar información de redirección
+    if ($upload_result['success']) {
+        $upload_result['redirect'] = "edit_vehicle.php?id=" . $car_id;
     }
 }
 

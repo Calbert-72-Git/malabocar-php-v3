@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 
@@ -297,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vehicle'])) {
                                 ?>
                                 <div class="image-preview-item">
                                     <?php if ($current_image): ?>
-                                        <img src="<?php echo $current_image['image_url']; ?>" alt="Imagen <?php echo $pos + 1; ?>">
+                                        <img src="<?php echo $current_image['image_url']; ?>" alt="Imagen <?php echo $pos + 1; ?>" onerror="this.src='../assets/images/no-image.jpg';">
                                         <div class="image-position">
                                             Posición <?php echo $pos + 1; ?>
                                             <?php if ($pos == 0): ?> (Principal)<?php endif; ?>
@@ -354,6 +353,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vehicle'])) {
                                     <i class="fas fa-upload"></i> Subir imagen
                                 </button>
                             </form>
+                            
+                            <div id="upload-progress" style="display:none;">
+                                <p>Subiendo imagen... <span id="progress-percent">0%</span></p>
+                                <div class="progress-bar">
+                                    <div id="progress-bar-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="upload-result" style="display:none; margin-top: 15px;"></div>
                         </div>
                     </div>
                 </div>
@@ -479,10 +487,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vehicle'])) {
                 <p>Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
-                <form method="post" action="delete_image.php" id="delete-image-form">
+                <form id="delete-image-form">
                     <input type="hidden" name="image_id" id="delete-image-id">
                     <button type="button" class="admin-btn secondary" onclick="closeModal('delete-image-modal')">Cancelar</button>
-                    <button type="submit" class="admin-btn danger">Eliminar</button>
+                    <button type="button" class="admin-btn danger" onclick="deleteImage()">Eliminar</button>
                 </form>
             </div>
         </div>
@@ -553,10 +561,99 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vehicle'])) {
             }
         }
         
+        // Subida de imágenes con AJAX para mostrar progreso
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+            
+            // Mostrar barra de progreso
+            document.getElementById('upload-progress').style.display = 'block';
+            document.getElementById('upload-button').disabled = true;
+            
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    document.getElementById('progress-percent').textContent = percentComplete + '%';
+                    document.getElementById('progress-bar-fill').style.width = percentComplete + '%';
+                }
+            });
+            
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    
+                    // Mostrar resultado
+                    const resultDiv = document.getElementById('upload-result');
+                    resultDiv.style.display = 'block';
+                    
+                    if (response.success) {
+                        resultDiv.innerHTML = '<div class="alert success"><i class="fas fa-check-circle"></i> ' + response.message + '</div>';
+                        
+                        // Recargar la página para mostrar la nueva imagen
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        resultDiv.innerHTML = '<div class="alert error"><i class="fas fa-exclamation-circle"></i> ' + response.message + '</div>';
+                    }
+                } else {
+                    document.getElementById('upload-result').innerHTML = '<div class="alert error"><i class="fas fa-exclamation-circle"></i> Error en la comunicación con el servidor.</div>';
+                    document.getElementById('upload-result').style.display = 'block';
+                }
+                
+                // Ocultar barra de progreso
+                document.getElementById('upload-progress').style.display = 'none';
+                document.getElementById('upload-button').disabled = false;
+            });
+            
+            xhr.addEventListener('error', function() {
+                document.getElementById('upload-result').innerHTML = '<div class="alert error"><i class="fas fa-exclamation-circle"></i> Error en la comunicación con el servidor.</div>';
+                document.getElementById('upload-result').style.display = 'block';
+                document.getElementById('upload-progress').style.display = 'none';
+                document.getElementById('upload-button').disabled = false;
+            });
+            
+            xhr.open('POST', 'upload_image.php', true);
+            xhr.send(formData);
+        });
+        
         // Confirmar eliminación de imagen
         function confirmDeleteImage(imageId) {
             document.getElementById('delete-image-id').value = imageId;
             document.getElementById('delete-image-modal').style.display = 'flex';
+        }
+        
+        // Eliminar imagen con AJAX
+        function deleteImage() {
+            const imageId = document.getElementById('delete-image-id').value;
+            const formData = new FormData();
+            formData.append('image_id', imageId);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'delete_image.php', true);
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // Cerrar modal y recargar página
+                            closeModal('delete-image-modal');
+                            window.location.reload();
+                        } else {
+                            alert('Error al eliminar la imagen: ' + response.message);
+                        }
+                    } catch (e) {
+                        alert('Error al procesar la respuesta del servidor');
+                    }
+                } else {
+                    alert('Error en la comunicación con el servidor');
+                }
+            };
+            
+            xhr.send(formData);
         }
         
         // Cerrar modal

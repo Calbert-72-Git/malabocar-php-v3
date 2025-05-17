@@ -13,7 +13,13 @@
 function uploadImage($file, $target_dir = "uploads/") {
     // Verificar que el directorio de uploads existe, si no, crearlo
     if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0755, true);
+        if (!mkdir($target_dir, 0755, true)) {
+            return [
+                'success' => false,
+                'message' => 'No se pudo crear el directorio de destino.',
+                'url' => ''
+            ];
+        }
     }
 
     $result = [
@@ -50,7 +56,7 @@ function uploadImage($file, $target_dir = "uploads/") {
         $result['message'] = 'Imagen subida correctamente';
         $result['url'] = $target_file;
     } else {
-        $result['message'] = 'Hubo un problema al guardar la imagen en el servidor.';
+        $result['message'] = 'Hubo un problema al guardar la imagen en el servidor. Verifique los permisos del directorio: ' . $target_dir;
     }
 
     return $result;
@@ -88,10 +94,36 @@ function getUploadErrorMessage($error_code) {
  */
 function deleteImage($image_path) {
     // Verificar que la imagen existe y está dentro del directorio de uploads
-    if (file_exists($image_path) && strpos($image_path, 'uploads/') === 0) {
+    if (file_exists($image_path) && (strpos($image_path, 'uploads/') === 0 || strpos($image_path, '../uploads/') === 0)) {
         return unlink($image_path);
     }
     
     return false;
+}
+
+/**
+ * Genera un nombre de directorio seguro para la subida de imágenes
+ * @param string $base_dir Directorio base
+ * @return string Ruta del directorio creado
+ */
+function ensureUploadDirectory($base_dir) {
+    // Asegurar que el directorio base existe
+    if (!file_exists($base_dir)) {
+        if (!mkdir($base_dir, 0755, true)) {
+            return false;
+        }
+    }
+    
+    // Generar subdirectorio por año y mes para organizar mejor
+    $year_month = date('Y/m');
+    $target_dir = $base_dir . '/' . $year_month . '/';
+    
+    if (!file_exists($target_dir)) {
+        if (!mkdir($target_dir, 0755, true)) {
+            return false;
+        }
+    }
+    
+    return $target_dir;
 }
 ?>

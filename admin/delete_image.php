@@ -29,12 +29,13 @@ if (!isset($_POST['image_id']) || empty($_POST['image_id'])) {
 
 $image_id = mysqli_real_escape_string($conn, $_POST['image_id']);
 
-// Obtener la ruta de la imagen antes de eliminarla
-$query = "SELECT image_url FROM car_images WHERE id = '$image_id'";
+// Obtener la información de la imagen antes de eliminarla
+$query = "SELECT car_id, image_url FROM car_images WHERE id = '$image_id'";
 $result = mysqli_query($conn, $query);
 
 if (mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
+    $car_id = $row['car_id'];
     $image_path = $row['image_url'];
     
     // Eliminar la referencia de la base de datos
@@ -43,12 +44,24 @@ if (mysqli_num_rows($result) > 0) {
         // Intentar eliminar el archivo físico
         if (file_exists($image_path)) {
             if (unlink($image_path)) {
-                $response = ['success' => true, 'message' => 'Imagen eliminada correctamente'];
+                $response = [
+                    'success' => true, 
+                    'message' => 'Imagen eliminada correctamente',
+                    'car_id' => $car_id
+                ];
             } else {
-                $response = ['success' => true, 'message' => 'Registro eliminado, pero no se pudo eliminar el archivo físico'];
+                $response = [
+                    'success' => true, 
+                    'message' => 'Registro eliminado, pero no se pudo eliminar el archivo físico',
+                    'car_id' => $car_id
+                ];
             }
         } else {
-            $response = ['success' => true, 'message' => 'Registro eliminado, pero el archivo físico no existía'];
+            $response = [
+                'success' => true, 
+                'message' => 'Registro eliminado, pero el archivo físico no existía',
+                'car_id' => $car_id
+            ];
         }
     } else {
         $response = ['success' => false, 'message' => 'Error al eliminar la imagen: ' . mysqli_error($conn)];
