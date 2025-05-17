@@ -1,4 +1,3 @@
-
 export interface Car {
   id: string;
   brand: string;
@@ -23,3 +22,9 @@ export type CartItem = {
   car: Car;
   quantity: number;
 };
+
+// Agregamos una interfaz para el administrador
+export interface Admin {
+  username: string;
+  password: string;
+}
