@@ -10,20 +10,57 @@ import { getAllCars } from '../data/cars';
 import { Car } from '../types/car';
 import { formatPrice } from '../utils/formatters';
 import { toast } from 'sonner';
+import DeleteVehicleDialog from '../components/admin/DeleteVehicleDialog';
+import { deleteVehicle } from '../services/vehicleService';
+import { Toaster } from '../components/ui/sonner';
 
 const AdminVehiclesPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [vehicles, setVehicles] = useState<Car[]>(getAllCars());
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<Car | null>(null);
 
   const filteredVehicles = vehicles.filter(car => 
     car.brand.toLowerCase().includes(searchTerm.toLowerCase()) || 
     car.model.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDeleteClick = (vehicle: Car) => {
+    setSelectedVehicle(vehicle);
+    setIsDeleting(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDeleting(false);
+    setSelectedVehicle(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedVehicle) return;
+    
+    try {
+      const result = await deleteVehicle(selectedVehicle.id);
+      
+      if (result.success) {
+        // Actualizar la lista de vehículos localmente
+        setVehicles(vehicles.filter(v => v.id !== selectedVehicle.id));
+        toast.success(result.message || "Vehículo eliminado correctamente");
+      } else {
+        toast.error(result.message || "Error al eliminar el vehículo");
+      }
+    } catch (error) {
+      toast.error("Error al procesar la solicitud");
+      console.error(error);
+    } finally {
+      handleCloseDialog();
+    }
+  };
+
   return (
     <AdminAuth>
       <Layout>
+        <Toaster position="top-right" />
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Gestión de Vehículos</h1>
@@ -97,7 +134,7 @@ const AdminVehiclesPage = () => {
                           <Button 
                             variant="destructive" 
                             size="sm"
-                            onClick={() => toast.info('Funcionalidad para eliminar vehículos en desarrollo')}
+                            onClick={() => handleDeleteClick(vehicle)}
                           >
                             Eliminar
                           </Button>
@@ -116,6 +153,13 @@ const AdminVehiclesPage = () => {
             </Table>
           </div>
         </div>
+
+        <DeleteVehicleDialog
+          isOpen={isDeleting}
+          onClose={handleCloseDialog}
+          onConfirm={handleConfirmDelete}
+          vehicle={selectedVehicle}
+        />
       </Layout>
     </AdminAuth>
   );
