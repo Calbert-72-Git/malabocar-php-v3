@@ -9,4 +9,4 @@
 @import "./cart.css";
 @import "./responsive.css";
 @import "./animations.css";
-
+@import "./compiled.css"; /* Agregamos el nuevo archivo CSS compilado */
