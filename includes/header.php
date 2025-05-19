@@ -22,7 +22,11 @@ function getCartCount() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoVenta - Plataforma de venta de coches</title>
+  <title>Malabo Car</title>
+
+    <meta name="description" content="Malabo Car - Plataforma de venta de coches" />
+    <meta name="author" content="Calbert 72" />
+
   <link rel="stylesheet" href="assets/css/styles.css">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
@@ -32,7 +36,7 @@ function getCartCount() {
       <div class="header-content">
         <div class="logo">
           <a href="index.php">
-            <h1>AutoVenta</h1>
+            <h1>Malabo Car</h1>
           </a>
         </div>
         
