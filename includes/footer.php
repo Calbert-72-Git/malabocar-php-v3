@@ -5,7 +5,7 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-info">
-          <h2>AutoVenta</h2>
+          <h2>Malabo Car</h2>
           <p>La mejor plataforma para comprar coches nuevos y de ocasión.</p>
           <div class="social-media">
             <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -35,7 +35,9 @@
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; <?php echo date("Y"); ?> AutoVenta. Todos los derechos reservados.</p>
+        <p>&copy; <?php echo date("Y"); ?> Malabo Car. Todos los derechos reservados.</p>
+        <p>By<a href="http://https:calbert72.com">Calbert 72</a></p>
+
       </div>
     </div>
   </footer>
