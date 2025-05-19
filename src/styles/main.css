@@ -1,12 +1,17 @@
 
-@import "./base.css";
-@import "./header.css";
-@import "./footer.css";
-@import "./buttons.css";
-@import "./cars.css";
-@import "./filters.css";
-@import "./car-details.css";
-@import "./cart.css";
-@import "./responsive.css";
-@import "./animations.css";
-@import "./compiled.css"; /* Agregamos el nuevo archivo CSS compilado */
+/* Este archivo ahora es solo para referencia ya que estamos importando cada archivo directamente en main.tsx */
+
+/* 
+Archivos CSS incluidos en el proyecto:
+- base.css: Estilos base y reseteo
+- header.css: Estilos del encabezado
+- footer.css: Estilos del pie de página
+- buttons.css: Estilos para botones
+- cars.css: Estilos para tarjetas de coches
+- filters.css: Estilos para filtros
+- car-details.css: Estilos para detalles de coches
+- cart.css: Estilos para el carrito
+- responsive.css: Estilos responsivos
+- animations.css: Animaciones
+- compiled.css: Estilos compilados para la aplicación PHP
+*/
